@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キラキラお名前入り選び取りカード</title>
+    <style>
+        :root {
+            --primary-color: #ff9a9e;
+            --secondary-color: #fecfef;
+            --accent-color: #ffde17;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff0f5 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1 {
+            color: #d87093;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .input-area {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(255, 154, 158, 0.15);
+            display: inline-block;
+            margin-bottom: 40px;
+            border: 2px solid var(--secondary-color);
+        }
+        input {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #ffe4e1;
+            border-radius: 30px;
+            width: 220px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--primary-color); }
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            box-shadow: 0 4px 10px rgba(255, 154, 158, 0.4);
+            transition: 0.2s;
+        }
+        button:hover { transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+        .print-btn { background: linear-gradient(45deg, #a1c4fd 0%, #c2e9fb 100%); box-shadow: 0 4px 10px rgba(161, 196, 253, 0.4); }
+
+        /* カードのコンテナ */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* カード単体のデザイン */
+        .card {
+            background: white;
+            border: 3px dashed #ffb6c1;
+            border-radius: 18px;
+            width: 220px;
+            height: 310px;
+            padding: 18px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.03);
+            background: linear-gradient(to bottom, #ffffff, #fffafa);
+            position: relative;
+            
+            /* 初期状態：隠しておく（アニメーション用） */
+            opacity: 0;
+            transform: scale(0.5) translateY(20px);
+        }
+
+        /* ワクワク出現アニメーション */
+        .card.show {
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .card-name {
+            font-size: 13px;
+            color: #b57c8a;
+            font-weight: bold;
+            background: #fff0f2;
+            padding: 4px 12px;
+            border-radius: 15px;
+            width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .card-icon {
+            font-size: 55px;
+            margin: 15px 0;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            animation: float 3s ease-in-out infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-5px) rotate(3deg); }
+        }
+        .card-title { font-size: 18px; font-weight: bold; color: #4a4a4a; margin-bottom: 5px; }
+        .card-desc { font-size: 11px; color: #7a7a7a; text-align: center; line-height: 1.5; font-weight: 500; }
+
+        /* キラキラエフェクトの要素 */
+        .sparkle {
+            position: absolute;
+            pointer-events: none;
+            background: var(--accent-color);
+            border-radius: 50%;
+            animation: glitter 1s linear forwards;
+            z-index: 999;
+        }
+        @keyframes glitter {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--mx), var(--my)) scale(0); opacity: 0; }
+        }
+
+        /* 印刷設定 */
+        @media print {
+            .input-area, .subtitle, h1 { display: none; }
+            body { background: white; padding: 0; }
+            .card-container { gap: 10px; }
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+                opacity: 1 !important;
+                transform: none !important;
+                animation: none !important;
+            }
+            .card-icon { animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>✨ 選び取りカードジェネレーター ✨</h1>
+    <div class="subtitle">1歳の誕生日を彩る、お名前入りのオリジナルカード</div>
+    
+    <div class="input-area">
+        <input type="text" id="childName" placeholder="お子様のお名前" maxlength="10">
+        <button onclick="startMagic()">魔法をかける！</button>
+        <button class="print-btn" onclick="window.print()">印刷・PDF保存</button>
+    </div>
+
+    <div class="card-container" id="cardContainer"></div>
+
+    <script>
+        const items = [
+            { icon: "🩺💉", title: "医者・ナース", desc: "人の命や健康を救う、<br>優しい人に" },
+            { icon: "🎸🎤", title: "ミュージシャン", desc: "音楽でたくさんの人を<br>感動させる人に" },
+            { icon: "⚽👟", title: "スポーツ選手", desc: "運動神経抜群で、<br>元気に世界へ羽ばたく人に" },
+            { icon: "👗👔", title: "アパレル・デザイナー", desc: "オシャレが大好きで、<br>センス抜群な人に" },
+            { icon: "📊🪙", title: "金融・投資家", desc: "お金の流れを読み解く、<br>経済のプロに" },
+            { icon: "🍳🍷", title: "料理やワイン", desc: "食を愛し、美味しいもので<br>人を幸せにする人に" },
+            { icon: "🎨🖌️", title: "画家・アーティスト", desc: "豊かな感性と表現力で、<br>世界を彩る人に" },
+            { icon: "💻📱", title: "パソコン＆携帯", desc: "最先端の技術を使いこなし、<br>時代を作る人に" },
+            { icon: "📖✏️", title: "本・学者", desc: "物知りでお勉強が大好き、<br>豊かな知識を持つ人に" },
+            { icon: "💼👔", title: "スーツとカバン", desc: "信頼される立派な会社員・<br>エリートビジネスマンに" },
+            { icon: "🔨📐", title: "大工・職人", desc: "手先が器用で、<br>ものづくりを極める人に" },
+            { icon: "💃🕺", title: "ダンサー", desc: "リズム感抜群で、体いっぱいに<br>自分を表現できる人に" },
+            { icon: "💰", title: "お金・お財布", desc: "一生お金に困らない、<br>豊かな生活を" },
+            { icon: "✈️🌍", title: "世界で活躍", desc: "グローバルに、<br>世界を舞台に活躍する人に" }
+        ];
+
+        // ページ読み込み時に初期カードを表示
+        window.onload = () => { displayCards("〇〇", false); };
+
+        function startMagic() {
+            const name = document.getElementById("childName").value || "〇〇";
+            
+            // ボタンの位置からキラキラを発生させる
+            const btn = document.querySelector("button");
+            const rect = btn.getBoundingClientRect();
+            createSparkles(rect.left + rect.width/2, rect.top + rect.height/2, 50);
+
+            // カードをアニメーション付きで再生成
+            displayCards(name, true);
+        }
+
+        function displayCards(name, animate) {
+            const container = document.getElementById("cardContainer");
+            container.innerHTML = ""; 
+
+            items.forEach((item, index) => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+                    <div class="card-name">${name}のえらびとり</div>
+                    <div class="card-icon">${item.icon}</div>
+                    <div>
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-desc">${item.desc}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                if (animate) {
+                    // 0.1秒ずつズラしてポンポンポンと表示させる（リズミカル！）
+                    setTimeout(() => {
+                        card.classList.add("show");
+                        // カードが出た瞬間にも軽くキラキラさせる
+                        const cRect = card.getBoundingClientRect();
+                        createSparkles(cRect.left + cRect.width/2, cRect.top + cRect.height/2, 5);
+                    }, index * 100);
+                } else {
+                    card.classList.add("show");
+                }
+            });
+        }
+
+        // キラキラエフェクトを生成する関数
+        function createSparkles(x, y, count) {
+            const colors = ['#ffde17', '#ffb6c1', '#a1c4fd', '#fff'];
+            for (let i = 0; i < count; i++) {
+                const sparkle = document.createElement("div");
+                sparkle.className = "sparkle";
+                
+                // ランダムな大きさと色
+                const size = Math.random() * 8 + 4;
+                sparkle.style.width = `${size}px`;
+                sparkle.style.height = `${size}px`;
+                sparkle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 飛び散る方向をランダムに計算
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 150 + 50;
+                sparkle.style.setProperty('--mx', `${Math.cos(angle) * distance}px`);
+                sparkle.style.setProperty('--my', `${Math.sin(angle) * distance}px`);
+                
+                // 発生位置（スクロール分を考慮）
+                sparkle.style.left = `${x + window.scrollX}px`;
+                sparkle.style.top = `${y + window.scrollY}px`;
+                
+                document.body.appendChild(sparkle);
+                
+                // アニメーションが終わったら消す
+                setTimeout(() => sparkle.
